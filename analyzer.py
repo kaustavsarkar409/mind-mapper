@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import tempfile
 from dataclasses import dataclass, asdict
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -31,6 +30,8 @@ class LinguisticMetrics:
     total_words: int
     unique_words: int
     filler_total: int
+    pronoun_noun_ratio: float
+    adj_adv_density: float
 
 
 @dataclass
@@ -39,6 +40,8 @@ class AcousticMetrics:
     pause_count: int
     speech_duration_sec: float
     words_per_minute: float
+    articulation_rate: float
+    pitch_variation: float
 
 
 @dataclass
@@ -67,7 +70,6 @@ class AnalysisResult:
         }
 
 
-@lru_cache(maxsize=1)
 def load_whisper_model():
     """Load and cache the local Whisper tiny model."""
     import whisper
@@ -75,7 +77,6 @@ def load_whisper_model():
     return whisper.load_model(WHISPER_MODEL_NAME)
 
 
-@lru_cache(maxsize=1)
 def load_spacy_model():
     """Load and cache the spaCy English model."""
     import spacy
@@ -134,6 +135,15 @@ def analyze_linguistics(text: str) -> LinguisticMetrics:
     filler_counts = {word: words.count(word) for word in sorted(FILLER_WORDS)}
     filler_total = sum(filler_counts.values())
 
+    # Count pronouns and nouns
+    pronouns_count = sum(1 for token in tokens if token.pos_ == "PRON")
+    nouns_count = sum(1 for token in tokens if token.pos_ in {"NOUN", "PROPN"})
+    pronoun_noun_ratio = pronouns_count / max(nouns_count, 1)
+
+    # Count adjectives and adverbs
+    adj_adv_count = sum(1 for token in tokens if token.pos_ in {"ADJ", "ADV"})
+    adj_adv_density = adj_adv_count / total_words
+
     return LinguisticMetrics(
         type_token_ratio=round(type_token_ratio, 3),
         avg_sentence_length=round(avg_sentence_length, 2),
@@ -141,6 +151,8 @@ def analyze_linguistics(text: str) -> LinguisticMetrics:
         total_words=total_words,
         unique_words=unique_words,
         filler_total=filler_total,
+        pronoun_noun_ratio=round(pronoun_noun_ratio, 2),
+        adj_adv_density=round(adj_adv_density, 3),
     )
 
 
@@ -176,11 +188,40 @@ def analyze_acoustics(
     )
     words_per_minute = (total_words / duration_sec) * 60.0 if duration_sec else 0.0
 
+    # Articulation rate: total words / actual speaking time (excluding silence/pauses)
+    total_pause_duration = sum(pause_durations)
+    speaking_duration = max(0.5, duration_sec - total_pause_duration)
+    articulation_rate = (total_words / speaking_duration) * 60.0
+
+    # Pitch variation estimation (YIN algorithm std dev or fallback to spectral centroid)
+    pitch_variation = 0.0
+    try:
+        # Use yin with frame parameters to make it fast
+        pitches = librosa.yin(
+            y,
+            fmin=60,
+            fmax=350,
+            sr=sample_rate,
+            frame_length=2048,
+            hop_length=512
+        )
+        valid_pitches = pitches[~np.isnan(pitches)]
+        if valid_pitches.size > 0:
+            pitch_variation = float(np.std(valid_pitches))
+    except Exception:
+        try:
+            cent = librosa.feature.spectral_centroid(y=y, sr=sample_rate)
+            pitch_variation = float(np.std(cent)) / 100.0
+        except Exception:
+            pitch_variation = 0.0
+
     return AcousticMetrics(
         avg_pause_duration=round(avg_pause_duration, 3),
         pause_count=len(pause_durations),
         speech_duration_sec=round(duration_sec, 2),
         words_per_minute=round(words_per_minute, 1),
+        articulation_rate=round(articulation_rate, 1),
+        pitch_variation=round(pitch_variation, 2),
     )
 
 
@@ -254,14 +295,26 @@ def _score_pauses(avg_pause: float, pause_count: int, duration_sec: float) -> tu
     return score, note
 
 
+def _score_pronoun_noun_ratio(ratio: float) -> tuple[float, str | None]:
+    if ratio > 0.65:
+        return 75.0, "High pronoun-to-noun ratio (potential anomia)"
+    if ratio > 0.45:
+        return 50.0, "Moderate pronoun-to-noun ratio"
+    return 15.0, None
+
+
+def _score_pitch_variation(std_dev: float) -> tuple[float, str | None]:
+    if std_dev > 0.0 and std_dev < 12.0:
+        return 65.0, "Monotone/reduced pitch variation"
+    return 15.0, None
+
+
 def calculate_risk_score(
     linguistic: LinguisticMetrics,
     acoustic: AcousticMetrics,
 ) -> RiskResult:
     """
     Rule-based 0–100 risk score from linguistic and acoustic markers.
-
-    Weights emphasize speech speed and filler usage for demo responsiveness.
     """
     rate_score, rate_note = _score_speech_rate(acoustic.words_per_minute)
     filler_score, filler_note = _score_fillers(
@@ -276,14 +329,18 @@ def calculate_risk_score(
         acoustic.pause_count,
         acoustic.speech_duration_sec,
     )
+    pronoun_score, pronoun_note = _score_pronoun_noun_ratio(linguistic.pronoun_noun_ratio)
+    pitch_score, pitch_note = _score_pitch_variation(acoustic.pitch_variation)
 
-    # Filler + speech rate dominate; linguistics and pauses refine the score.
+    # Compile the weighted score
     raw_score = (
-        rate_score * 0.30
-        + filler_score * 0.30
-        + pause_score * 0.20
-        + ttr_score * 0.12
-        + sentence_score * 0.08
+        rate_score * 0.25
+        + filler_score * 0.25
+        + pause_score * 0.15
+        + pronoun_score * 0.15
+        + ttr_score * 0.10
+        + sentence_score * 0.05
+        + pitch_score * 0.05
     )
     score = round(_clamp(raw_score), 1)
 
@@ -299,7 +356,7 @@ def calculate_risk_score(
 
     factors = [
         note
-        for note in (rate_note, filler_note, pause_note, ttr_note, sentence_note)
+        for note in (rate_note, filler_note, pause_note, pronoun_note, ttr_note, sentence_note, pitch_note)
         if note
     ]
     if not factors:
@@ -351,12 +408,16 @@ def get_demo_analysis() -> AnalysisResult:
         total_words=58,
         unique_words=24,
         filler_total=11,
+        pronoun_noun_ratio=0.55,
+        adj_adv_density=0.086,
     )
     acoustic = AcousticMetrics(
         avg_pause_duration=0.62,
         pause_count=5,
         speech_duration_sec=30.0,
         words_per_minute=116.0,
+        articulation_rate=135.2,
+        pitch_variation=10.4,
     )
     risk = calculate_risk_score(linguistic, acoustic)
     transcript = (

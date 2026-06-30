@@ -1064,6 +1064,10 @@ def render_results(result: AnalysisResult, view_mode: str) -> None:
             # Filler word rate: healthy is < 0.05
             filler_rate = ling.filler_total / max(ling.total_words, 1)
             st.markdown(render_biomarker_range("Filler Word Rate", filler_rate, 0.0, 0.25, 0.0, 0.05), unsafe_allow_html=True)
+            # Pronoun-Noun ratio: healthy is 0.10 - 0.45
+            st.markdown(render_biomarker_range("Pronoun-Noun Ratio", ling.pronoun_noun_ratio, 0.0, 1.2, 0.10, 0.45), unsafe_allow_html=True)
+            # Adjective/Adverb density: healthy is 0.12 - 0.28
+            st.markdown(render_biomarker_range("Adjective/Adverb Density", ling.adj_adv_density, 0.0, 0.40, 0.12, 0.28), unsafe_allow_html=True)
             
             ling_extra_html = clean_html(f"""
                 <div style="height: 0.75rem;"></div>
@@ -1096,10 +1100,14 @@ def render_results(result: AnalysisResult, view_mode: str) -> None:
             
             # Speech rate: healthy is 110 - 160
             st.markdown(render_biomarker_range("Speech Rate (WPM)", ac.words_per_minute, 50.0, 200.0, 110.0, 160.0, " WPM"), unsafe_allow_html=True)
+            # Articulation rate: healthy is 125 - 175
+            st.markdown(render_biomarker_range("Articulation Rate", ac.articulation_rate, 50.0, 250.0, 125.0, 175.0, " WPM"), unsafe_allow_html=True)
             # Avg pause duration: healthy is < 0.5s
             st.markdown(render_biomarker_range("Avg Pause Duration", ac.avg_pause_duration, 0.0, 1.5, 0.0, 0.50, "s"), unsafe_allow_html=True)
             # Pause count: healthy is <= 3 per 30s
             st.markdown(render_biomarker_range("Pause Count", ac.pause_count, 0, 12, 0, 3), unsafe_allow_html=True)
+            # Pitch Variation: healthy is 15.0 - 45.0
+            st.markdown(render_biomarker_range("Pitch Variation", ac.pitch_variation, 0.0, 60.0, 15.0, 45.0, " Hz"), unsafe_allow_html=True)
             
             acoustic_extra_html = clean_html(f"""
                 <div style="height: 0.75rem;"></div>
