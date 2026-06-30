@@ -25,10 +25,26 @@ CUSTOM_CSS = textwrap.dedent("""
     [data-testid="stToolbar"] { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
 
-    /* Global theme resets */
+    /* Global theme resets & custom scrollbar */
     html, body, [class*="css"] {
         font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif !important;
         color: #E2E8F0;
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: rgba(9, 13, 22, 0.5) !important;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: rgba(20, 184, 166, 0.3) !important;
+        border-radius: 99px !important;
+        border: 2px solid #090D16 !important;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: rgba(20, 184, 166, 0.5) !important;
     }
 
     @keyframes gradientBG {
@@ -131,49 +147,49 @@ CUSTOM_CSS = textwrap.dedent("""
 
     /* Custom Clinical Glass Cards */
     .clinical-card {
-        background: rgba(17, 24, 39, 0.65);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-top: 2px solid rgba(20, 184, 166, 0.35);
-        border-radius: 20px;
-        padding: 1.5rem;
-        margin-bottom: 1.25rem;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        background: rgba(15, 23, 42, 0.55) !important;
+        backdrop-filter: blur(20px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        border-top: 2px solid rgba(20, 184, 166, 0.5) !important;
+        border-radius: 20px !important;
+        padding: 1.5rem !important;
+        margin-bottom: 1.25rem !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease, border-color 0.4s ease !important;
     }
 
     .clinical-card:hover {
-        transform: translateY(-2px);
-        border-color: rgba(20, 184, 166, 0.4);
-        box-shadow: 0 12px 35px rgba(20, 184, 166, 0.12);
+        transform: translateY(-4px) !important;
+        border-color: rgba(20, 184, 166, 0.6) !important;
+        box-shadow: 0 20px 40px rgba(20, 184, 166, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
     .clinical-card--risk-low {
-        border-top: 3px solid #10B981;
-        box-shadow: 0 8px 30px rgba(16, 185, 129, 0.05);
+        border-top: 3px solid #10B981 !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     }
     .clinical-card--risk-low:hover {
-        border-color: rgba(16, 185, 129, 0.5);
-        box-shadow: 0 12px 35px rgba(16, 185, 129, 0.12);
+        border-color: rgba(16, 185, 129, 0.6) !important;
+        box-shadow: 0 20px 40px rgba(16, 185, 129, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
     .clinical-card--risk-elevated {
-        border-top: 3px solid #F59E0B;
-        box-shadow: 0 8px 30px rgba(245, 158, 11, 0.05);
+        border-top: 3px solid #F59E0B !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     }
     .clinical-card--risk-elevated:hover {
-        border-color: rgba(245, 158, 11, 0.5);
-        box-shadow: 0 12px 35px rgba(245, 158, 11, 0.12);
+        border-color: rgba(245, 158, 11, 0.6) !important;
+        box-shadow: 0 20px 40px rgba(245, 158, 11, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
     .clinical-card--risk-high {
-        border-top: 3px solid #EF4444;
-        box-shadow: 0 8px 30px rgba(239, 68, 68, 0.06);
+        border-top: 3px solid #EF4444 !important;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
     }
     .clinical-card--risk-high:hover {
-        border-color: rgba(239, 68, 68, 0.5);
-        box-shadow: 0 12px 35px rgba(239, 68, 68, 0.15);
+        border-color: rgba(239, 68, 68, 0.6) !important;
+        box-shadow: 0 20px 40px rgba(239, 68, 68, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
     }
 
     /* Hero Badge */
@@ -447,33 +463,37 @@ CUSTOM_CSS = textwrap.dedent("""
 
     /* Metric Tiles */
     .metric-tile {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 0.8rem 1rem;
-        margin-bottom: 0.5rem;
-        transition: all 0.25s ease;
+        background: rgba(15, 23, 42, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-left: 3px solid rgba(20, 184, 166, 0.4) !important;
+        border-radius: 12px !important;
+        padding: 0.8rem 1.1rem !important;
+        margin-bottom: 0.5rem !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
     }
 
     .metric-tile:hover {
-        border-color: rgba(20, 184, 166, 0.3);
-        background: rgba(20, 184, 166, 0.03);
+        background: rgba(20, 184, 166, 0.05) !important;
+        border-color: rgba(20, 184, 166, 0.4) !important;
+        border-left-color: #34D399 !important;
+        transform: scale(1.02) !important;
     }
 
     .metric-title {
-        font-size: 0.68rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #64748B;
-        margin-bottom: 0.25rem;
+        font-size: 0.68rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.06em !important;
+        color: #64748B !important;
+        margin-bottom: 0.25rem !important;
     }
 
     .metric-value {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #F1F5F9;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 1.25rem !important;
+        font-weight: 700 !important;
+        color: #F1F5F9 !important;
     }
 
     /* Contributing factors */
@@ -603,28 +623,35 @@ CUSTOM_CSS = textwrap.dedent("""
     }
 
     .patient-exercise-card {
-        background: rgba(255, 255, 255, 0.02);
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-left: 3px solid #14B8A6;
-        border-radius: 8px;
-        padding: 0.85rem;
-        margin-bottom: 0.6rem;
+        background: rgba(15, 23, 42, 0.45) !important;
+        border: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-left: 4px solid #14B8A6 !important;
+        border-radius: 12px !important;
+        padding: 1rem !important;
+        margin-bottom: 0.85rem !important;
+        transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+
+    .patient-exercise-card:hover {
+        background: rgba(20, 184, 166, 0.04) !important;
+        border-left-color: #34D399 !important;
+        transform: translateX(4px) !important;
     }
 
     .patient-exercise-title {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: #E2E8F0;
-        margin-bottom: 0.25rem;
-        display: flex;
-        align-items: center;
-        gap: 6px;
+        font-size: 0.85rem !important;
+        font-weight: 700 !important;
+        color: #E2E8F0 !important;
+        margin-bottom: 0.25rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
     }
 
     .patient-exercise-desc {
-        font-size: 0.78rem;
-        color: #94A3B8;
-        line-height: 1.4;
+        font-size: 0.78rem !important;
+        color: #94A3B8 !important;
+        line-height: 1.4 !important;
     }
 
     /* Custom Streamlit Radio to Segmented Control override styling */
@@ -798,15 +825,33 @@ def _risk_theme(category: str) -> dict:
     return _RISK_UI.get(category, _RISK_UI["Elevated"])
 
 
-def _risk_gauge_svg(score: float, stroke: str, glow_filter: str) -> str:
-    """Build SVG arc gauge; circumference ≈ 565 for r=90."""
+def _risk_gauge_svg(score: float, category: str, glow_filter: str) -> str:
+    """Build SVG arc gauge with gradient stroke; circumference ≈ 565 for r=90."""
     circumference = 565.48
     offset = circumference - (score / 100.0) * circumference
+    
+    # Choose gradient based on category
+    if category == "Low":
+        stop_color_1 = "#10B981"
+        stop_color_2 = "#34D399"
+    elif category == "High Risk":
+        stop_color_1 = "#EF4444"
+        stop_color_2 = "#881337"
+    else:  # Elevated
+        stop_color_1 = "#F59E0B"
+        stop_color_2 = "#EA580C"
+        
     return f"""
     <svg class="risk-gauge-svg" viewBox="0 0 200 200" style="filter: {glow_filter};">
+        <defs>
+            <linearGradient id="gaugeGradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="{stop_color_1}" />
+                <stop offset="100%" stop-color="{stop_color_2}" />
+            </linearGradient>
+        </defs>
         <circle class="risk-gauge-track" cx="100" cy="100" r="90"/>
         <circle class="risk-gauge-fill" cx="100" cy="100" r="90"
-            stroke="{stroke}"
+            stroke="url(#gaugeGradient)"
             stroke-dasharray="{circumference}"
             stroke-dashoffset="{offset}"/>
     </svg>
@@ -865,7 +910,7 @@ def render_risk_card(result: AnalysisResult) -> None:
         <div class="risk-widget-shell">
             <div class="risk-widget-label">Cognitive Risk Index</div>
             <div class="risk-gauge-wrap">
-                {_risk_gauge_svg(risk.score, theme['stroke'], theme['glow'])}
+                {_risk_gauge_svg(risk.score, risk.category, theme['glow'])}
                 <div class="risk-gauge-center">
                     <span class="risk-score-huge {theme['score']}">{risk.score:.0f}</span>
                     <span class="risk-score-unit">percent</span>
