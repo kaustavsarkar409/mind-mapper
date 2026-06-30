@@ -1195,6 +1195,60 @@ def run_analysis_from_upload(uploaded_file) -> AnalysisResult | None:
     return None
 
 
+def render_about_page() -> None:
+    about_html = clean_html("""
+    <div class="clinical-card">
+        <div class="hero-badge">
+            <span class="hero-pulse-dot"></span>
+            Project & Technical Overview
+        </div>
+        <p class="main-header" style="font-size: 2.2rem !important; margin-bottom: 1rem;">About <span>MindMarker</span></p>
+        <p style="color: #94A3B8; font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem;">
+            MindMarker is a clinical-grade digital screening tool engineered to detect subtle cognitive changes through the analysis of spontaneous vocal samples. 
+            By mapping acoustic and linguistic parameters against established neurological baselines, the platform generates a non-invasive screening index 
+            suggestive of cognitive load, fatigue, or early neurodegenerative signals.
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 2rem;">
+            <div class="metric-tile" style="border-left-color: #14B8A6; padding: 1.2rem;">
+                <div style="font-size: 1.1rem; font-weight: 700; color: #14B8A6; margin-bottom: 0.5rem;">🧬 Linguistic Processing</div>
+                <p style="color: #94A3B8; font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                    Syntactic tagging detects noun-finding hesitations (anomia) and descriptive language decline. 
+                    Calculates Type-Token Ratio (lexical variety), Pronoun-Noun ratio, and Adjective/Adverb density using <strong>spaCy NLP</strong> models.
+                </p>
+            </div>
+            <div class="metric-tile" style="border-left-color: #38BDF8; padding: 1.2rem;">
+                <div style="font-size: 1.1rem; font-weight: 700; color: #38BDF8; margin-bottom: 0.5rem;">🩺 Acoustic Analysis</div>
+                <p style="color: #94A3B8; font-size: 0.85rem; line-height: 1.5; margin: 0;">
+                    Pause frequency, speech tempo, and articulation rates are parsed via energy-threshold decibel segmentations. 
+                    Pitch variation ($F_0$ standard deviation) is computed using <strong>Librosa signal processing</strong> to flag monotone vocal expressions.
+                </p>
+            </div>
+        </div>
+
+        <div class="metric-tile" style="border-left-color: #10B981; padding: 1.2rem; margin-bottom: 2rem;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #10B981; margin-bottom: 0.5rem;">🧠 The Clinical Link</div>
+            <p style="color: #94A3B8; font-size: 0.85rem; line-height: 1.6; margin: 0;">
+                Clinical research indicates that early cognitive decline (such as mild cognitive impairment and dementia) often manifests in speech long before 
+                standard clinical cognitive batteries detect changes. Common signs include:
+                <br>• Increased filler word rate and prolonged silent pauses during sentence planning.
+                <br>• Lexical simplification, marked by a high ratio of generic pronouns (*it, this, that*) instead of specific nouns.
+                <br>• Loss of vocal pitch inflection (flat affect or monotone delivery) due to motor-speech planning strain.
+            </p>
+        </div>
+
+        <div class="metric-tile" style="border-left-color: #EF4444; padding: 1.2rem; margin-bottom: 1rem;">
+            <div style="font-size: 1.1rem; font-weight: 700; color: #EF4444; margin-bottom: 0.5rem;">⚠️ Disclaimer & Intended Use</div>
+            <p style="color: #94A3B8; font-size: 0.85rem; line-height: 1.6; margin: 0;">
+                MindMarker is a pre-clinical research prototype and does not represent an FDA-cleared diagnostic test or medical advice. 
+                It is intended solely as an investigational screening dashboard for clinicians and researchers tracking longitudinal vocal trends.
+            </p>
+        </div>
+    </div>
+    """)
+    st.markdown(about_html, unsafe_allow_html=True)
+
+
 def main() -> None:
     # Inject animated background glow circles
     st.markdown(
@@ -1203,104 +1257,122 @@ def main() -> None:
     )
     render_sidebar()
 
-    hero_html = clean_html("""
-    <div class="clinical-card">
-        <div class="hero-badge">
-            <span class="hero-pulse-dot"></span>
-            AI Cognitive Biomarker Engine
-        </div>
-        <p class="main-header">Mind<span>Marker</span></p>
-        <p class="sub-header">
-            Non-invasive screening of cognitive risk through acoustic and linguistic speech biomarkers. 
-            Analyze a spontaneous speech sample in seconds.
-        </p>
-    </div>
-    """)
-    st.markdown(hero_html, unsafe_allow_html=True)
-
-    # File uploader and actions
-    uploader_html_start = clean_html("""
-    <div class="clinical-card">
-        <div class="section-title">🎙️ Audio Sample Upload</div>
-    """)
-    st.markdown(uploader_html_start, unsafe_allow_html=True)
-    
-    uploaded = st.file_uploader(
-        "Upload a speech sample (.wav or .mp3, ~30 seconds)",
-        type=["wav", "mp3"],
-        help="Record spontaneous speech — e.g., describe your day or a familiar picture.",
-        label_visibility="collapsed"
-    )
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    btn_col1, btn_col2, _ = st.columns([1, 1, 2])
-    with btn_col1:
-        analyze_clicked = st.button("Analyze Speech", type="primary", use_container_width=True)
-    with btn_col2:
-        demo_clicked = st.button("Load Demo Sample", use_container_width=True)
-
-    if "last_result" not in st.session_state:
-        st.session_state.last_result = None
-
-    if demo_clicked:
-        st.session_state.last_result = get_demo_analysis()
-        st.success("Demo sample loaded.")
-
-    if analyze_clicked:
-        if uploaded is None:
-            st.warning("Upload an audio file first, or click **Load Demo Sample**.")
-        else:
-            soundwave_placeholder = st.empty()
-            soundwave_placeholder.markdown(
-                clean_html("""
-                <div class="clinical-card" style="text-align: center;">
-                    <p style="color: #14B8A6; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">Processing Speech Biomarkers...</p>
-                    <div class="waveform-container">
-                        <div class="waveform-bar bar-1"></div>
-                        <div class="waveform-bar bar-2"></div>
-                        <div class="waveform-bar bar-3"></div>
-                        <div class="waveform-bar bar-4"></div>
-                        <div class="waveform-bar bar-5"></div>
-                        <div class="waveform-bar bar-6"></div>
-                        <div class="waveform-bar bar-7"></div>
-                        <div class="waveform-bar bar-8"></div>
-                    </div>
-                </div>
-                """),
-                unsafe_allow_html=True
-            )
-            result = run_analysis_from_upload(uploaded)
-            soundwave_placeholder.empty()
-            if result is not None:
-                st.session_state.last_result = result
-                st.success("Analysis complete.")
-
-    if st.session_state.last_result is not None:
-        st.markdown('<div style="height: 1rem;"></div>', unsafe_allow_html=True)
-        view_mode = st.radio(
-            "Select Dashboard View Mode",
-            options=["Patient Dashboard", "Clinician Dashboard"],
+    # Small top navbar using columns
+    nav_col1, nav_col2 = st.columns([1, 1])
+    with nav_col1:
+        st.markdown('<div style="padding-top: 10px;"><span style="font-size: 1.55rem; font-weight: 800; color: #14B8A6; font-family: \'Plus Jakarta Sans\', sans-serif;">🩺 Mind<span style="color: #34D399;">Marker</span></span></div>', unsafe_allow_html=True)
+    with nav_col2:
+        current_tab = st.radio(
+            "Navigation",
+            options=["Screening Tool", "About Project"],
             horizontal=True,
-            label_visibility="collapsed"
+            label_visibility="collapsed",
+            key="top_nav_tabs"
         )
-        st.markdown('<div style="height: 0.5rem;"></div>', unsafe_allow_html=True)
-        render_results(st.session_state.last_result, view_mode)
-    else:
-        onboard_html = clean_html("""
+    
+    st.markdown('<div style="height: 1.5rem;"></div>', unsafe_allow_html=True)
+
+    if current_tab == "Screening Tool":
+        hero_html = clean_html("""
         <div class="clinical-card">
-            <p class="panel-heading" style="color: #14B8A6;">Getting Started</p>
-            <ol class="onboard-steps" style="line-height: 2; color: #94A3B8; padding-left: 1.2rem;">
-                <li>Upload an audio recording (~30 seconds of speech in English).</li>
-                <li>Click <strong>Analyze Speech</strong>, or click <strong>Load Demo Sample</strong> for instant visualization.</li>
-            </ol>
-            <p style="color: #64748B; font-size: 0.82rem; margin-top: 1rem; line-height: 1.5;">
-                The diagnostic engine will perform local audio segmentation (energy detection), 
-                transcribe using neural network architectures, and map acoustic/linguistic ratios against standard baselines.
+            <div class="hero-badge">
+                <span class="hero-pulse-dot"></span>
+                AI Cognitive Biomarker Engine
+            </div>
+            <p class="main-header">🩺 Mind<span>Marker</span></p>
+            <p class="sub-header">
+                Non-invasive screening of cognitive risk through acoustic and linguistic speech biomarkers. 
+                Analyze a spontaneous speech sample in seconds.
             </p>
         </div>
         """)
-        st.markdown(onboard_html, unsafe_allow_html=True)
+        st.markdown(hero_html, unsafe_allow_html=True)
+
+        # File uploader and actions
+        uploader_html_start = clean_html("""
+        <div class="clinical-card">
+            <div class="section-title">🎙️ Audio Sample Upload</div>
+        """)
+        st.markdown(uploader_html_start, unsafe_allow_html=True)
+        
+        uploaded = st.file_uploader(
+            "Upload a speech sample (.wav or .mp3, ~30 seconds)",
+            type=["wav", "mp3"],
+            help="Record spontaneous speech — e.g., describe your day or a familiar picture.",
+            label_visibility="collapsed"
+        )
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
+        btn_col1, btn_col2, _ = st.columns([1, 1, 2])
+        with btn_col1:
+            analyze_clicked = st.button("Analyze Speech", type="primary", use_container_width=True)
+        with btn_col2:
+            demo_clicked = st.button("Load Demo Sample", use_container_width=True)
+
+        if "last_result" not in st.session_state:
+            st.session_state.last_result = None
+
+        if demo_clicked:
+            st.session_state.last_result = get_demo_analysis()
+            st.success("Demo sample loaded.")
+
+        if analyze_clicked:
+            if uploaded is None:
+                st.warning("Upload an audio file first, or click **Load Demo Sample**.")
+            else:
+                soundwave_placeholder = st.empty()
+                soundwave_placeholder.markdown(
+                    clean_html("""
+                    <div class="clinical-card" style="text-align: center;">
+                        <p style="color: #14B8A6; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">Processing Speech Biomarkers...</p>
+                        <div class="waveform-container">
+                            <div class="waveform-bar bar-1"></div>
+                            <div class="waveform-bar bar-2"></div>
+                            <div class="waveform-bar bar-3"></div>
+                            <div class="waveform-bar bar-4"></div>
+                            <div class="waveform-bar bar-5"></div>
+                            <div class="waveform-bar bar-6"></div>
+                            <div class="waveform-bar bar-7"></div>
+                            <div class="waveform-bar bar-8"></div>
+                        </div>
+                    </div>
+                    """),
+                    unsafe_allow_html=True
+                )
+                result = run_analysis_from_upload(uploaded)
+                soundwave_placeholder.empty()
+                if result is not None:
+                    st.session_state.last_result = result
+                    st.success("Analysis complete.")
+
+        if st.session_state.last_result is not None:
+            st.markdown('<div style="height: 1rem;"></div>', unsafe_allow_html=True)
+            view_mode = st.radio(
+                "Select Dashboard View Mode",
+                options=["Patient Dashboard", "Clinician Dashboard"],
+                horizontal=True,
+                label_visibility="collapsed"
+            )
+            st.markdown('<div style="height: 0.5rem;"></div>', unsafe_allow_html=True)
+            render_results(st.session_state.last_result, view_mode)
+        else:
+            onboard_html = clean_html("""
+            <div class="clinical-card">
+                <p class="panel-heading" style="color: #14B8A6;">Getting Started</p>
+                <ol class="onboard-steps" style="line-height: 2; color: #94A3B8; padding-left: 1.2rem;">
+                    <li>Upload an audio recording (~30 seconds of speech in English).</li>
+                    <li>Click <strong>Analyze Speech</strong>, or click <strong>Load Demo Sample</strong> for instant visualization.</li>
+                </ol>
+                <p style="color: #64748B; font-size: 0.82rem; margin-top: 1rem; line-height: 1.5;">
+                    The diagnostic engine will perform local audio segmentation (energy detection), 
+                    transcribe using neural network architectures, and map acoustic/linguistic ratios against standard baselines.
+                </p>
+            </div>
+            """)
+            st.markdown(onboard_html, unsafe_allow_html=True)
+    else:
+        render_about_page()
 
 
 if __name__ == "__main__":
