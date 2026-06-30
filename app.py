@@ -22,6 +22,11 @@ CUSTOM_CSS = textwrap.dedent("""
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     .stDeployButton { display: none !important; }
+    [data-testid="stHeader"] {
+        background-color: transparent !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
     [data-testid="stToolbar"] { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
 
