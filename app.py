@@ -791,6 +791,21 @@ CUSTOM_CSS = textwrap.dedent("""
         50% { transform: translate(-140px, -60px) scale(1.1); }
         100% { transform: translate(-80px, -120px) scale(0.85); }
     }
+
+    /* Floating brain background visual */
+    .bg-brain {
+        position: fixed;
+        bottom: -2%;
+        right: -2%;
+        width: 550px;
+        height: 550px;
+        opacity: 0.05;
+        pointer-events: none;
+        z-index: -1;
+        transform: rotate(-12deg);
+        filter: drop-shadow(0 0 15px rgba(20, 184, 166, 0.15));
+        transition: opacity 0.5s ease;
+    }
 </style>
 """)
 
@@ -1254,10 +1269,53 @@ def render_about_page() -> None:
     st.markdown(about_html, unsafe_allow_html=True)
 
 
-def main() -> None:
-    # Inject animated background glow circles
+    # Inject animated background glow circles and watermarked brain visual
     st.markdown(
-        '<div class="bg-glow-1"></div><div class="bg-glow-2"></div>',
+        clean_html("""
+        <div class="bg-glow-1"></div>
+        <div class="bg-glow-2"></div>
+        <div class="bg-brain">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor">
+                <!-- Cerebrum Outer Outline -->
+                <path d="M 50 15 
+                         C 25 15, 10 25, 10 45 
+                         C 10 60, 20 65, 30 70 
+                         C 35 72, 40 80, 45 80
+                         C 48 80, 49 85, 50 85
+                         C 51 85, 52 80, 55 80
+                         C 60 80, 65 72, 70 70
+                         C 80 65, 90 60, 90 45
+                         C 90 25, 75 15, 50 15 Z" 
+                      stroke="#14B8A6" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Inner Folds Left -->
+                <path d="M 50 25 C 38 25, 30 30, 30 40 C 30 48, 42 45, 45 52 C 47 55, 42 62, 38 62" stroke="#34D399" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 35 32 C 22 35, 18 45, 25 52 C 28 55, 25 60, 20 58" stroke="#14B8A6" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 45 20 C 30 22, 22 28, 25 35" stroke="#34D399" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 48 38 C 40 38, 38 42, 42 46 C 45 49, 48 50, 46 55" stroke="#14B8A6" stroke-width="0.8" stroke-linecap="round"/>
+                
+                <!-- Inner Folds Right -->
+                <path d="M 50 25 C 62 25, 70 30, 70 40 C 70 48, 58 45, 55 52 C 53 55, 58 62, 62 62" stroke="#38BDF8" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 65 32 C 78 35, 82 45, 75 52 C 72 55, 75 60, 80 58" stroke="#14B8A6" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 55 20 C 70 22, 78 28, 75 35" stroke="#38BDF8" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 52 38 C 60 38, 62 42, 58 46 C 55 49, 52 50, 54 55" stroke="#14B8A6" stroke-width="0.8" stroke-linecap="round"/>
+                
+                <!-- Cerebellum (Lower Back) -->
+                <path d="M 32 71 C 32 78, 40 82, 48 80 C 45 77, 42 74, 42 71 Z" fill="none" stroke="#34D399" stroke-width="0.8" stroke-linecap="round"/>
+                <path d="M 68 71 C 68 78, 60 82, 52 80 C 55 77, 58 74, 58 71 Z" fill="none" stroke="#38BDF8" stroke-width="0.8" stroke-linecap="round"/>
+                
+                <!-- Brain Stem -->
+                <path d="M 47 80 L 47 95 C 47 97, 53 97, 53 95 L 53 80" stroke="#14B8A6" stroke-width="1.2" stroke-linecap="round"/>
+                
+                <!-- Neural Nodes -->
+                <circle cx="50" cy="15" r="1.5" fill="#14B8A6"/>
+                <circle cx="10" cy="45" r="1.2" fill="#34D399"/>
+                <circle cx="90" cy="45" r="1.2" fill="#38BDF8"/>
+                <circle cx="50" cy="85" r="1.5" fill="#14B8A6"/>
+                <circle cx="30" cy="40" r="1" fill="#34D399"/>
+                <circle cx="70" cy="40" r="1" fill="#38BDF8"/>
+            </svg>
+        </div>
+        """),
         unsafe_allow_html=True
     )
     render_sidebar()
