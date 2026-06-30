@@ -22,7 +22,16 @@ CUSTOM_CSS = textwrap.dedent("""
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     .stDeployButton { display: none !important; }
-    [data-testid="stHeader"] { background: transparent !important; }
+    [data-testid="stHeader"] { 
+        background: transparent !important; 
+        pointer-events: none !important;
+    }
+    [data-testid="stHeader"] button,
+    [data-testid="collapsedControl"],
+    button[title="Expand sidebar"],
+    button[aria-label="Expand sidebar"] {
+        pointer-events: auto !important;
+    }
     [data-testid="stToolbar"] { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
 
@@ -59,6 +68,16 @@ CUSTOM_CSS = textwrap.dedent("""
         background-color: #0B0F19 !important;
         border-right: 1px solid rgba(20, 184, 166, 0.15) !important;
         box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4) !important;
+        color: #E2E8F0 !important;
+    }
+    
+    [data-testid="stSidebar"] p, 
+    [data-testid="stSidebar"] li, 
+    [data-testid="stSidebar"] span, 
+    [data-testid="stSidebar"] strong, 
+    [data-testid="stSidebar"] div,
+    [data-testid="stSidebar"] a {
+        color: #E2E8F0 !important;
     }
 
     [data-testid="stSidebar"] hr {
@@ -709,25 +728,33 @@ CUSTOM_CSS = textwrap.dedent("""
     }
 
     /* Style the sidebar toggle button when collapsed */
-    [data-testid="collapsedControl"] {
+    [data-testid="collapsedControl"], 
+    button[title="Expand sidebar"], 
+    button[aria-label="Expand sidebar"] {
         display: flex !important;
-        background-color: rgba(15, 23, 42, 0.85) !important;
-        border: 1px solid rgba(20, 184, 166, 0.5) !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        background-color: rgba(15, 23, 42, 0.95) !important;
+        border: 2px solid #14B8A6 !important;
         border-radius: 12px !important;
         top: 15px !important;
         left: 15px !important;
         padding: 8px !important;
-        box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3) !important;
-        z-index: 9999999 !important;
+        box-shadow: 0 4px 20px rgba(20, 184, 166, 0.4) !important;
+        z-index: 99999999 !important;
         transition: all 0.3s ease !important;
     }
 
-    [data-testid="collapsedControl"]:hover {
+    [data-testid="collapsedControl"]:hover,
+    button[title="Expand sidebar"]:hover,
+    button[aria-label="Expand sidebar"]:hover {
         background-color: rgba(20, 184, 166, 0.2) !important;
         transform: scale(1.05) !important;
     }
 
-    [data-testid="collapsedControl"] svg {
+    [data-testid="collapsedControl"] svg,
+    button[title="Expand sidebar"] svg,
+    button[aria-label="Expand sidebar"] svg {
         fill: #14B8A6 !important;
         color: #14B8A6 !important;
         width: 24px !important;
@@ -735,7 +762,8 @@ CUSTOM_CSS = textwrap.dedent("""
     }
 
     /* Style the sidebar collapse button inside the sidebar */
-    section[data-testid="stSidebar"] button {
+    section[data-testid="stSidebar"] button,
+    section[data-testid="stSidebar"] button[title="Collapse sidebar"] {
         background-color: rgba(20, 184, 166, 0.1) !important;
         border: 1px solid rgba(20, 184, 166, 0.3) !important;
         border-radius: 8px !important;
@@ -743,7 +771,8 @@ CUSTOM_CSS = textwrap.dedent("""
         transition: all 0.2s ease !important;
     }
 
-    section[data-testid="stSidebar"] button:hover {
+    section[data-testid="stSidebar"] button:hover,
+    section[data-testid="stSidebar"] button[title="Collapse sidebar"]:hover {
         background-color: rgba(20, 184, 166, 0.25) !important;
         color: #34D399 !important;
     }
