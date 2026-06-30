@@ -22,16 +22,6 @@ CUSTOM_CSS = textwrap.dedent("""
     #MainMenu { visibility: hidden; }
     footer { visibility: hidden; }
     .stDeployButton { display: none !important; }
-    [data-testid="stHeader"] { 
-        background: transparent !important; 
-        pointer-events: none !important;
-    }
-    [data-testid="stHeader"] button,
-    [data-testid="collapsedControl"],
-    button[title="Expand sidebar"],
-    button[aria-label="Expand sidebar"] {
-        pointer-events: auto !important;
-    }
     [data-testid="stToolbar"] { display: none !important; }
     [data-testid="stDecoration"] { display: none !important; }
 
@@ -727,55 +717,7 @@ CUSTOM_CSS = textwrap.dedent("""
         line-height: 1.5;
     }
 
-    /* Style the sidebar toggle button when collapsed */
-    [data-testid="collapsedControl"], 
-    button[title="Expand sidebar"], 
-    button[aria-label="Expand sidebar"] {
-        display: flex !important;
-        visibility: visible !important;
-        opacity: 1 !important;
-        background-color: rgba(15, 23, 42, 0.95) !important;
-        border: 2px solid #14B8A6 !important;
-        border-radius: 12px !important;
-        top: 15px !important;
-        left: 15px !important;
-        padding: 8px !important;
-        box-shadow: 0 4px 20px rgba(20, 184, 166, 0.4) !important;
-        z-index: 99999999 !important;
-        transition: all 0.3s ease !important;
-    }
 
-    [data-testid="collapsedControl"]:hover,
-    button[title="Expand sidebar"]:hover,
-    button[aria-label="Expand sidebar"]:hover {
-        background-color: rgba(20, 184, 166, 0.2) !important;
-        transform: scale(1.05) !important;
-    }
-
-    [data-testid="collapsedControl"] svg,
-    button[title="Expand sidebar"] svg,
-    button[aria-label="Expand sidebar"] svg {
-        fill: #14B8A6 !important;
-        color: #14B8A6 !important;
-        width: 24px !important;
-        height: 24px !important;
-    }
-
-    /* Style the sidebar collapse button inside the sidebar */
-    section[data-testid="stSidebar"] button,
-    section[data-testid="stSidebar"] button[title="Collapse sidebar"] {
-        background-color: rgba(20, 184, 166, 0.1) !important;
-        border: 1px solid rgba(20, 184, 166, 0.3) !important;
-        border-radius: 8px !important;
-        color: #14B8A6 !important;
-        transition: all 0.2s ease !important;
-    }
-
-    section[data-testid="stSidebar"] button:hover,
-    section[data-testid="stSidebar"] button[title="Collapse sidebar"]:hover {
-        background-color: rgba(20, 184, 166, 0.25) !important;
-        color: #34D399 !important;
-    }
 
     /* Floating background glows for clinical animation */
     .bg-glow-1 {
